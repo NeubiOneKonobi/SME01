@@ -1,4 +1,3 @@
-
 //******************************************************************
 // Title: Mega "SME"
 // Name:  William Evans
@@ -167,16 +166,16 @@ const byte COLS = 8; //Eight columns of custom Keypad 1
 //(I just numbered them sequentially - the final translation is done in the case statements)
 char keys[ROWS][COLS] = {
   {
-    '1','2','3','4','5','6','7','8'                  }
+    '1','2','3','4','5','6','7','8'                    }
   ,
   {
-    'A','B','C','D','E','F','G','H'                  }
+    'A','B','C','D','E','F','G','H'                    }
   ,
   {
-    'I','J','K','L','M','N','O','P'                  }
+    'I','J','K','L','M','N','O','P'                    }
   ,
   {
-    'Q','R','S','T','U','V','W','X'                  }
+    'Q','R','S','T','U','V','W','X'                    }
 };
 byte rowPins[ROWS] = {
   0, 1, 2, 3}; //connect to the row pinouts of the keypad
@@ -233,14 +232,14 @@ void setup()
   Wire.write(0xFF); // set all of port B to Inputs
   Wire.endTransmission();
 
-    Wire.beginTransmission(KPAdr); // I2C bus address for Keypad INPUTS
-    Wire.write(0x00); // IODIRA register
-    Wire.write(0xFF); // set all of port A to Inputs
-    Wire.endTransmission();
-    Wire.beginTransmission(KPAdr);
-    Wire.write(0x01); // IODIRB register
-    Wire.write(0xFF); // set all of port B to Inputs
-    Wire.endTransmission();
+  Wire.beginTransmission(KPAdr); // I2C bus address for Keypad INPUTS
+  Wire.write(0x00); // IODIRA register
+  Wire.write(0xFF); // set all of port A to Inputs
+  Wire.endTransmission();
+  Wire.beginTransmission(KPAdr);
+  Wire.write(0x01); // IODIRB register
+  Wire.write(0xFF); // set all of port B to Inputs
+  Wire.endTransmission();
 
   //Uncomment for Extra Expansion Ports 
   Wire.beginTransmission(AuxAdr); // I2C bus address for Misc INPUTS/OUTPUTS
@@ -319,9 +318,9 @@ void setup()
 //**********SUB ROUTINES*******************************
 void toneup() {
   int melody[] = {
-    NOTE_DS7, NOTE_DS7, NOTE_DS7, NOTE_G7  };
+    NOTE_DS7, NOTE_DS7, NOTE_DS7, NOTE_G7    };
   int noteDurations[] = {
-    12,12,12,4   };
+    12,12,12,4     };
   for (int thisNote = 0; thisNote < 4; thisNote++) {
     int noteDuration = 1000/noteDurations[thisNote];
     tone(speakerpin, melody[thisNote],noteDuration);
@@ -333,9 +332,9 @@ void toneup() {
 
 void tonedown() {
   int melody[] = {
-    NOTE_G7,NOTE_G7,NOTE_G7,NOTE_DS7  };
+    NOTE_G7,NOTE_G7,NOTE_G7,NOTE_DS7    };
   int noteDurations[] = {
-    12,12,12,4   };
+    12,12,12,4     };
   for (int thisNote = 0; thisNote < 4; thisNote++) {
     int noteDuration = 1000/noteDurations[thisNote];
     tone(speakerpin, melody[thisNote],noteDuration);
@@ -379,12 +378,12 @@ byte bcdToDec(byte value, int rank)
   {
     Temp = value & B11110000; // get upper nibble ( value 0-15)
     Temp >>=4;  // move upper nibble four places to right to get rid of lower nibble
-}
+  }
   else if (rank == 2)// wanted lower nibble
   {
     Temp = value & B00001111; // get lower nibble and drop upper nibble (value 0-15)
   }
-return Temp;
+  return Temp;
 } // end bcdToDec(byte value, int rank)
 
 void SetBit(byte MaskForBit, int AdrofChip, int PortNumber, int ONOrOff)
@@ -872,7 +871,7 @@ void dokey(char a)
 //} //end  SetEtherAntenna()
 
 
- 
+
 void SetEtherRelays(){
   if (GetBit(B00000001,EthAdr,GPIOB) == 1) {
     // Set Relay in question
@@ -1276,12 +1275,9 @@ void SetAntB(int inputB, int AltBflag) {
 
 } // End SetAntB()
 
-
-
-//********** Main Program******************************
-void loop() {
-
-  //PWSwitch = digitalRead(22); // check if Radio turned on!
+void GetData()
+{
+  PWSwitch = digitalRead(22); // check if Radio turned on!
   Etherflag = GetBit(B10000000,EthAdr,GPIOB);  // get etherflag as either 1 or 0
   BCDRA = bcdToDec(GetInputs(RadAdr, GPIOA),1); // get Radios A inputs & Convert to decimal
   BCDRB = bcdToDec(GetInputs(RadAdr, GPIOA),2);// get Radio B inputs & Convert to decimal
@@ -1291,6 +1287,9 @@ void loop() {
   BCDA2 = GetInputs(AuxAdr,'B'); // get Aux B inputs
   BCDE1 = GetInputs(EthAdr,'A'); // get Ethernet 1 inputs  
   BCDE2 = GetInputs(EthAdr,'B'); // Get Ethernet 2 inputs 
+}// end GetData
+
+void TestPrint() {
   lcd.setCursor(0,2);
   //    lcd.print("EF=");
   //    lcd.print(Etherflag);
@@ -1322,18 +1321,25 @@ void loop() {
   lcd.print(DLBflag);
   lcd.print(" PWS=");
   lcd.print(PWSwitch);
-  //delay(2000);
-  //    SetEtherAntenna();
-  //    SetEtherRelays();
-  //    while (Etherflag == 0){// Ethernet control active =1
-  //        lcd.setCursor(0,1);
-  //lcd.print("TEST");
-  //
-  //} // end while Etherflag == 0)
+} // end TestPrint
 
+void EtherOn (){  // Ethernet control active
+  while (Etherflag == 1) {
+    //    SetEtherAntenna();
+    //    SetEtherRelays();
+    // Print Ethermessage ()
+  } // end while Etherflag == 1)
+  Etherflag = GetBit(B10000000,EthAdr,GPIOB);  // get etherflag as either 1 or 0
 
+}// end EtherOn
 
-  while (PWSwitch == 1){ //radio Turned on
+void RadioOff() {   // Radio off, so do nothing!
+  if (PWSwitch == 0) {
+  }
+} //end RadioOff
+
+void RadioOn () {  // Radio is turned on!
+  while (PWSwitch == 1) {
     //lcd.setCursor(0,1);
     //lcd.print("TEST");
     char key = kpd.getKey(); // variable for key pressed on keyboad
@@ -1445,12 +1451,35 @@ void loop() {
         //        }// endif(key<10)
       }//end else if (DLBflag == 0)
     }// end if ManBflag == 1      
-    //PWSwitch = digitalRead(22); // check if Radio turned on!
-  }// endif(PWSwitch == 1)
+    PWSwitch = digitalRead(22); // check if Radio turned on!
+  }// end while(PWSwitch == 1)
+} // end while RadioOn
+
+
+//********** Main Program******************************
+void loop() {
+  GetData();
+  TestPrint();
+  EtherOn ();
+  RadioOff(); 
+  RadioOn();
+
+  //    SetEtherAntenna();
+  //    SetEtherRelays();
+  //    while (Etherflag == 0){// Ethernet control active =1
+  //        lcd.setCursor(0,1);
+  //lcd.print("TEST");
+  //
+  //} // end while Etherflag == 0)
+
+
+
+
   char key = kpd.getKey(); // variable for key pressed on keyboad
   if (key == 76) {  // Key for AntB is pressed          
     dokey(key);
   }// endif
 
 }// end void Loop()
+
 
